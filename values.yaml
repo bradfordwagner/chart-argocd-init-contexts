@@ -1,0 +1,23 @@
+---
+
+image:
+  # TODO: change this to mirrored
+  repository: quay.io/argoproj/argocd
+  tag: v2.3.3
+
+argocd:
+  server: argocd-server:443
+  auth:
+    insecure: true
+    secret:
+      # secret name to load from
+      # required fields: username/password
+      name: login
+
+contexts:
+  prefix: "kind-"
+  # required: this must be pre-populated
+  # loads the contexts within the configmap file
+  # each key is a different context file
+  secret:
+    name: contexts

@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "fullname" . }}
+  labels:
+    {{- include "labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: main
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          command:
+            - /bin/bash
+            - -lc
+            - |
+              # load username/password from secret
+              argocd login {{ .Values.argocd.server }} \
+                {{ if .Values.argocd.auth.insecure}}--insecure \{{ end }}
+                --username ${username} \
+                --password ${password}
+
+              # show current contexts
+              argocd context
+
+              # bootstrap contexts which exist in the contexts secret
+              cd /contexts
+              echo bootstrapping clusters
+              ls | xargs -I % argocd cluster add --kubeconfig % {{ .Values.contexts.prefix}}% --name % -y --upsert
+          envFrom:
+            - secretRef:
+                name: {{ .Values.argocd.auth.secret.name }}
+          volumeMounts:
+            - mountPath: /contexts
+              name: contexts
+      volumes:
+        - name: contexts
+          secret:
+            secretName: {{ .Values.contexts.secret.name }}
