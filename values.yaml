@@ -2,8 +2,8 @@
 
 image:
   # TODO: change this to mirrored
-  repository: quay.io/bradfordwagner/argocli
-  tag: 2.3.2-argocli-v3.3.1
+  repository: quay.io/argoproj/argocd
+  tag: v2.6.2
 
 argocd:
   server: argocd-server:443
